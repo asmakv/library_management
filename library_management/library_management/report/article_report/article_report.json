@@ -1,0 +1,33 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2024-05-22 12:33:48.880334",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{}",
+ "letterhead": null,
+ "modified": "2024-05-22 15:30:32.979993",
+ "modified_by": "Administrator",
+ "module": "Library Management",
+ "name": "Article report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Article",
+ "report_name": "Article report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Library Member"
+  },
+  {
+   "role": "Librarian"
+  }
+ ]
+}

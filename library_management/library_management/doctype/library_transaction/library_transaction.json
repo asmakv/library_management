@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:LT-{YY}{MM}{DD}{####}",
+ "creation": "2024-03-22 11:21:15.609146",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "library_member",
+  "type",
+  "date",
+  "amended_from",
+  "delay_fine",
+  "damaged_fine",
+  "total_fine",
+  "article_list"
+ ],
+ "fields": [
+  {
+   "fieldname": "library_member",
+   "fieldtype": "Link",
+   "label": "Library Member",
+   "options": "Library Member"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Issue\nReturn"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Library Transaction",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "depends_on": "eval:doc.type==\"Return\"",
+   "fieldname": "damaged_fine",
+   "fieldtype": "Select",
+   "label": "Damaged Fine",
+   "options": "0\n10\n20\n30\n40\n50\n60"
+  },
+  {
+   "depends_on": "eval:doc.type==\"Return\"",
+   "fieldname": "delay_fine",
+   "fieldtype": "Currency",
+   "label": "Delay Fine"
+  },
+  {
+   "depends_on": "eval:doc.type==\"Return\"",
+   "fieldname": "total_fine",
+   "fieldtype": "Currency",
+   "label": "Total Fine"
+  },
+  {
+   "fieldname": "article_list",
+   "fieldtype": "Table",
+   "label": "article list",
+   "options": "Article List"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-05-27 14:23:56.057543",
+ "modified_by": "Administrator",
+ "module": "Library Management",
+ "name": "Library Transaction",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
