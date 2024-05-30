@@ -1,5 +1,6 @@
 import frappe
 from frappe.model.document import Document
+from frappe.model.docstatus import DocStatus
 
 class LibraryTransaction(Document):
     def before_submit(self):
@@ -20,11 +21,34 @@ class LibraryTransaction(Document):
                 article.save()
 
     def validate_issue(self):
+        # Validate membership
         self.validate_membership()
+
+        # Get the maximum number of issued articles allowed
+        issued_articles_limit = frappe.db.get_single_value('Library Settings', 'issued_articles')
+
+        # Calculate the total number of issued articles for this member
+        issued_count = frappe.db.sql("""
+            SELECT COUNT(*)
+            FROM `tabLibrary Transaction` AS lt
+            INNER JOIN `tabArticle List` AS al ON lt.name = al.parent
+            WHERE lt.library_member = %s
+            AND lt.type = 'Issue'
+            AND lt.docstatus = 1
+        """, self.library_member)[0][0] or 0
+
+        # Include the articles being issued in the current transaction
+        total_issued_articles = issued_count + len(self.article_list)
+
+        # Check if the total exceeds the limit
+        if total_issued_articles > issued_articles_limit:
+            frappe.throw('The member has already reached the maximum number of issued articles')
+
+        # Check if each article is already issued
         for row in self.article_list:
-            article = frappe.get_doc("Article", row.article)
-            if article.status == "Issued":
-                frappe.throw("Article is already issued by another member")
+            article = frappe.get_doc('Article', row.article)
+            if article.status == 'Issued':
+                frappe.throw(f'Article {article.name} is already issued by another member')
 
     def before_save(self):
         if self.type == "Return":
@@ -40,6 +64,7 @@ class LibraryTransaction(Document):
                 frappe.throw("Article cannot be returned without being issued first")
 
     def validate_membership(self):
+        # Check if a valid membership exists for this library member
         valid_membership = frappe.db.exists(
             "Library Membership",
             {
@@ -82,12 +107,18 @@ class LibraryTransaction(Document):
 
                 if actual_duration > loan_period:
                     single_day_fine = frappe.db.get_single_value('Library Settings', 'single_day_fine')
-                    delay_fine += single_day_fine * (actual_duration - loan_period)
-
+                    row.delay_fine = single_day_fine * (actual_duration - loan_period)
+                else:
+                    row.delay_fine = 0
+            else:
+                row.delay_fine = 0
         return delay_fine
 
     def update_article_list(self):
+        # Fetch the Library Member document
         library_member = frappe.get_doc("Library Member", self.library_member)
+
+        # Iterate through article_list and add issued articles to Article List
         if self.type == "Issue":
             for row in self.article_list:
                 article = frappe.get_doc("Article", row.article)
@@ -95,6 +126,7 @@ class LibraryTransaction(Document):
                     "article_name": article.name,
                     # "issue_date": self.date,
                     # "due_date": self.due_date  # Ensure these fields exist in your doctype
-                    })
+                })
 
+        # Save the updated Library Member document
         library_member.save()
